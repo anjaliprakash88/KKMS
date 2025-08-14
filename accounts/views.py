@@ -8,17 +8,71 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
 from django.http import JsonResponse
-from accounts.models import Customer,NewsEvents,Banners, Payment
+from accounts.models import Customer,NewsEvents,Banners, Payment, AboutUs, CharityManagement
 from django.conf import settings
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+def contact(request):
+    return render(request, "accounts/contact.html")
+    
+def privacy_policy(request):
+    return render(request, "accounts/privacy_policy.html")
+
+
+def terms(request):
+    return render(request, "accounts/terms.html")
+
+def charity_view(request):
+    """
+    Display all charity items.
+    """
+    charities = CharityManagement.objects.all()  # Get all charity entries
+    return render(request, "accounts/charity.html", {"charities": charities})
+
+def about(request):
+    about_us = AboutUs.objects.first()  
+    images = about_us.images.all() if about_us else []  
+
+    context = {
+        "about_us": about_us,
+        "images": images,
+    }
+
+    return render(request, "accounts/about.html", context)
+
+def home(request):
+    banners = Banners.objects.filter(status=1).order_by("-id") 
+    news_articles = NewsEvents.objects.filter(status=1).order_by("-id")
+    return render(
+        request,
+        "accounts/index.html",
+        {
+            "banners": banners,
+            "news_articles": news_articles,
+        },
+    )
+
+
+@login_required
+def customer_list(request):
+    customers = Customer.objects.select_related('user').all()  # fetch related user
+    return render(request, 'super_admin/customers.html', {'customers': customers})
+
+
+
 @login_required
 def customer_dashboard(request):
-    return render(request, "customer_dashboard/dashboard.html")
-    
+    # Ensure the logged-in user is a customer
+    if not hasattr(request.user, "customer_profile"):
+        return redirect("login")  # redirect non-customers to login or error page
+
+    customer = request.user.customer_profile  # get Customer object
+    return render(request, "customer_dashboard/dashboard.html", {"customer": customer})
+
+
 def customer_login(request):
     if request.method == "POST":
         identifier = request.POST.get("email_or_mobile")

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KKMS - Kerala Kaikola/Mudali Sangam</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://via.placeholder.com/1920x600');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        .event-card, .news-card {
+            transition: transform 0.3s;
+        }
+        .event-card:hover, .news-card:hover {
+            transform: translateY(-10px);
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 40px 0;
+        }
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">KKMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about/">About KKMS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/charity/">Charity</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Policy
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="policyDropdown">
+                            <li><a class="dropdown-item" href="/privacy-policy/">Privacy Policy</a></li>
+                            <li><a class="dropdown-item" href="/terms-and-conditions/">Terms & Conditions</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact/">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register-customer/">Matrimony Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white" href="/customer-login/">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero/Banner Section -->
+    <section class="hero-section">
+        <div class="container">
+            {% for banner in banners %}
+            <h1>{{ banner.banner_text1 }}</h1>
+            <p class="lead">{{ banner.banner_text2 }}</p>
+            <p>{{ banner.banner_text3 }}</p>
+            <a href="#" class="btn btn-primary btn-lg mt-3">Learn More</a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Our Special Events</h2>
+            <h3 class="text-center mb-5">Wedding Events</h3>
+            <div class="row">
+                {% for event in wedding_events %}
+                <div class="col-md-6 mb-4">
+                    <div class="card event-card shadow-sm">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ event.name }}</h4>
+                            <p class="card-text"><strong>Time:</strong> {{ event.start_time|time:"g:i A" }} - {{ event.end_time|time:"g:i A" }}</p>
+                            <p class="card-text"><strong>Date:</strong> {{ event.date|date:"l j, F, Y" }}</p>
+                            <p class="card-text">{{ event.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-md-6 mb-4">
+                    <div class="card event-card shadow-sm">
+                        <div class="card-body">
+                            <h4 class="card-title">Main Ceremony</h4>
+                            <p class="card-text"><strong>Time:</strong> 4:00 PM - 6:00 PM</p>
+                            <p class="card-text"><strong>Date:</strong> {{ wedding_date|date:"l j, F, Y" }}</p>
+                            <p class="card-text">Join us for our wedding ceremony where we exchange vows and begin our journey together as husband and wife.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card event-card shadow-sm">
+                        <div class="card-body">
+                            <h4 class="card-title">Wedding Reception</h4>
+                            <p class="card-text"><strong>Time:</strong> 7:00 PM - 12:00 AM</p>
+                            <p class="card-text"><strong>Date:</strong> {{ wedding_date|date:"l j, F, Y" }}</p>
+                            <p class="card-text">Celebrate with us at our reception with dinner, dancing, and festivities to honor our special day.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Latest Updates</h2>
+            <h3 class="text-center mb-5">News & Announcements</h3>
+            <p class="text-center mb-5">Stay updated with the latest news from KERALA KAIKOLA/MUDALI SANGAM</p>
+            <div class="row">
+                {% for news in news_articles %}
+                <div class="col-md-4 mb-4">
+                    <div class="card news-card shadow-sm">
+                        {% if news.image %}
+                        <img src="{{ news.image }}" class="card-img-top" alt="{{ news.title }}">
+                        {% else %}
+                        <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="News placeholder">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ news.title }}</h5>
+                            <p class="card-text">{{ news.content|truncatewords:30 }}</p>
+                            <p class="card-text"><small class="text-muted">{{ news.created_date|date:"M d, Y" }}</small></p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p>No news articles available.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p>© {% now "Y" %} {{ about.author|default:"KKMS Team" }}. All Rights Reserved.</p>
+            <p>Designed and Developed by TechFIFO Innovations</p>
+            <div class="mt-3">
+                {% if social_links.twitter %}
+                <a href="{{ social_links.twitter }}" class="mx-2"><i class="bi bi-twitter"></i> Twitter</a>
+                {% endif %}
+                {% if social_links.facebook %}
+                <a href="{{ social_links.facebook }}" class="mx-2"><i class="bi bi-facebook"></i> Facebook</a>
+                {% endif %}
+                {% if social_links.instagram %}
+                <a href="{{ social_links.instagram }}" class="mx-2"><i class="bi bi-instagram"></i> Instagram</a>
+                {% endif %}
+                {% if social_links.linkedin %}
+                <a href="{{ social_links.linkedin }}" class="mx-2"><i class="bi bi-linkedin"></i> LinkedIn</a>
+                {% endif %}
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS and Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

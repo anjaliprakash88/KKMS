@@ -1,11 +1,47 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 
+class CharityManagement(models.Model):
+    title = models.CharField(max_length=200)
+    image = models.ImageField(upload_to="charity/")
+    is_active= models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  
 
+    def __str__(self):
+        return self.title
+
+class AboutUs(models.Model):
+    mission = models.TextField()
+    affiliation = models.TextField()
+    history = models.TextField()
+    main_title = models.CharField(max_length=255, default="Administration Team")
+    is_active= models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  
+
+    def __str__(self):
+        return self.main_title
+
+class AboutUsImage(models.Model):
+    about_us = models.ForeignKey(
+        AboutUs, on_delete=models.CASCADE, related_name="images"
+    )
+    image = models.ImageField(upload_to="about/")
+    designation = models.CharField(max_length=255, blank=True, null=True)  
+    is_active= models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  
+
+    def __str__(self):
+        return f"{self.designation or 'Image'} for {self.about_us.main_title}"
 
 
 # ---------------NEWSEVENTS MODEL---------------
+
+
 class NewsEvents(models.Model):
     STATUS_CHOICES = (
         (0, "Inactive"),
@@ -16,9 +52,13 @@ class NewsEvents(models.Model):
     content = models.TextField()
     status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     image = models.ImageField(upload_to="news/", blank=True, null=True)
+    is_active= models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  
 
     def __str__(self):
         return self.title
+
 
 # ---------------BANNER MODEL---------------
 class Banners(models.Model):
@@ -32,6 +72,9 @@ class Banners(models.Model):
     banner_text2 = models.CharField(max_length=250, blank=True, null=True)
     banner_text3 = models.TextField(blank=True, null=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=1)
+    is_active= models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  
 
     def __str__(self):
         return self.banner_text1 or f"Banner {self.id}"
@@ -131,7 +174,9 @@ class Payment(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")
     payment_date = models.DateTimeField()
     amount = models.IntegerField()
-    created_date = models.DateTimeField()
+    is_active= models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  
 
     def __str__(self):
         return f"{self.customer.user.username} - {self.amount}"
