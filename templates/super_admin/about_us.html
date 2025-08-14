@@ -1,0 +1,61 @@
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+            <div class="header">
+                <div class="header-content">
+                    <h1>About us Management</h1>
+                    <p>Manage and organize your KKMS news articles</p>
+                </div>
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addAboutModal">
+                    ➕ Add About Us 
+                </button>
+
+            </div>
+<div class="container mt-5">
+    <h2>About Us Entries</h2>
+    <table id="aboutUsTable" class="display table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Main Title</th>
+                <th>Mission</th>
+                <th>Affiliation</th>
+                <th>History</th>
+                <th>Images</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for about in about_entries %}
+            <tr>
+                <td>{{ about.id }}</td>
+                <td>{{ about.main_title }}</td>
+                <td>{{ about.mission }}</td>
+                <td>{{ about.affiliation }}</td>
+                <td>{{ about.history }}</td>
+                <td>
+                    {% for img in about.active_images %}
+                        <img src="{{ img.image.url }}" alt="{{ img.designation }}" width="50" style="margin:2px;">
+                    {% empty %}
+                        No images
+                    {% endfor %}
+                </td>
+                <td>{{ about.created_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ about.updated_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#aboutUsTable').DataTable({
+            "pageLength": 10,
+            "lengthChange": true,
+            "ordering": true
+        });
+    });
+</script>

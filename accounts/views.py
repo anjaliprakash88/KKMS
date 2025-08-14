@@ -8,12 +8,30 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
 from django.http import JsonResponse
-from accounts.models import Customer,NewsEvents,Banners, Payment, AboutUs, CharityManagement
+from accounts.models import Customer,NewsEvents,Banners, Payment, AboutUs, CharityManagement, AboutUsImage
 from django.conf import settings
 from django.db.models import Q
+from django.db.models import Prefetch
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
+
+def about_us_list(request):
+    # Fetch all active AboutUs entries with only active images
+    about_entries = AboutUs.objects.filter(is_active=True).prefetch_related(
+        Prefetch(
+            "images",
+            queryset=AboutUsImage.objects.filter(is_active=True),
+            to_attr="active_images"
+        )
+    )
+
+    return render(
+        request,
+        "super_admin/about_us.html",
+        {"about_entries": about_entries},
+    )
 
 def banner_list_view(request):
     banners = Banners.objects.filter(is_active=True).order_by("-id")

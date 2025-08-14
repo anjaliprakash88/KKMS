@@ -27,6 +27,8 @@ urlpatterns = [
 
     path('customers/', views.customer_list, name='customer-list'),
 
+    path("about-us/", views.about_us_list, name="about-us-list"),
+
 
     path('register-customer/', views.register_customer, name='register_customer'),
     path('customer-login/', views.customer_login, name='customer-login'),
