@@ -15,6 +15,50 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+def banner_list_view(request):
+    banners = Banners.objects.filter(is_active=True).order_by("-id")
+    return render(request, "super_admin/banner.html", {"banners": banners})
+
+
+def banner_add_view(request):
+    if request.method == "POST":
+        banner_image = request.FILES.get("banner_image")
+        banner_text1 = request.POST.get("banner_text1")
+        banner_text2 = request.POST.get("banner_text2")
+        banner_text3 = request.POST.get("banner_text3")
+        status = request.POST.get("status") or 1
+
+        Banners.objects.create(
+            banner_image=banner_image,
+            banner_text1=banner_text1,
+            banner_text2=banner_text2,
+            banner_text3=banner_text3,
+            status=status
+        )
+        messages.success(request, "Banner added successfully!")
+        return redirect("banner-list")    
+
+def banner_edit(request, pk):
+    banner = get_object_or_404(Banners, pk=pk)
+    if request.method == "POST":
+        banner.banner_text1 = request.POST.get("banner_text1")
+        banner.banner_text2 = request.POST.get("banner_text2")
+        banner.banner_text3 = request.POST.get("banner_text3")
+        banner.status = request.POST.get("status")
+        if request.FILES.get("banner_image"):
+            banner.banner_image = request.FILES.get("banner_image")
+        banner.save()
+        return redirect("banner-list")  # redirect to the banner table page
+
+    return redirect("banner-list")
+
+def banner_delete(request, pk):
+    banner = get_object_or_404(Banners, pk=pk)
+    banner.is_active = False  # soft delete
+    banner.save()
+    return redirect('banner-list') 
+
+
 def contact(request):
     return render(request, "accounts/contact.html")
     

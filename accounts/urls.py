@@ -15,11 +15,15 @@ urlpatterns = [
     path("super-admin/dashboard/", views.custom_admin_dashboard, name="super_admin_dashboard"),
 
 
-
     path('news/', views.news_list, name='news_list'),
     path('news/create/', views.news_create, name='news_create'),
     path('news/update/', views.news_update, name='news_update'),
     path('news/delete/<int:pk>/', views.news_delete, name='news_delete'),
+
+    path("banners/", views.banner_list_view, name="banner-list"),
+    path("banners/add/", views.banner_add_view, name="banner-add"),
+    path("banners/<int:pk>/edit/", views.banner_edit, name="banner-edit"),
+    path("banners/<int:pk>/delete/", views.banner_delete, name="banner-delete"),
 
     path('customers/', views.customer_list, name='customer-list'),
 
