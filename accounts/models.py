@@ -115,6 +115,41 @@ class Customer(models.Model):
         ("Thandan", "Thandan"),
     )
 
+    MARITAL_STATUS_CHOICES = (
+        ("Single", "Single"),
+        ("Divorced", "Divorced"),
+    )
+
+    STAR_CHOICES = (
+        ("Aswathi", "Aswathi"),
+        ("Bharani", "Bharani"),
+        ("Karthika", "Karthika"),
+        ("Rohini", "Rohini"),
+        ("Makayiram", "Makayiram"),
+        ("Thiruvathira", "Thiruvathira"),
+        ("Punartham", "Punartham"),
+        ("Pooyam", "Pooyam"),
+        ("Aayilyam", "Aayilyam"),
+        ("Makam", "Makam"),
+        ("Pooram", "Pooram"),
+        ("Uthram", "Uthram"),
+        ("Atham", "Atham"),
+        ("Chittira", "Chittira"),
+        ("Chothi", "Chothi"),
+        ("Vishakam", "Vishakam"),
+        ("Anizham", "Anizham"),
+        ("Thiruketta", "Thiruketta"),
+        ("Moolam", "Moolam"),
+        ("Pooradam", "Pooradam"),
+        ("Uthradam", "Uthradam"),
+        ("Thiruvonam", "Thiruvonam"),
+        ("Avittam", "Avittam"),
+        ("Chathayam", "Chathayam"),
+        ("Pooruruttathi", "Pooruruttathi"),
+        ("Uthrattathi", "Uthrattathi"),
+        ("Revathi", "Revathi"),
+    )
+
     father_name = models.CharField(max_length=256, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
     gender = models.CharField(max_length=256, blank=True, null=True)
@@ -123,7 +158,7 @@ class Customer(models.Model):
     profile_image = models.ImageField(upload_to="profile_images/", null=True, blank=True)  
     id_proof = models.CharField(max_length=256, blank=True, null=True)
     address = models.CharField(max_length=300, blank=True, null=True)
-    star = models.CharField(max_length=300, blank=True, null=True)
+    star = models.CharField(max_length=50, choices=STAR_CHOICES, blank=True, null=True)
     married_sisters = models.CharField(max_length=250, blank=True, null=True)
     married_brothers = models.CharField(max_length=250, blank=True, null=True)
     no_sisters = models.CharField(max_length=250, blank=True, null=True)
@@ -141,7 +176,7 @@ class Customer(models.Model):
     company = models.CharField(max_length=250, blank=True, null=True)
     job = models.CharField(max_length=250, blank=True, null=True)
     caste = models.CharField(max_length=250, choices=CASTE_CHOICES, blank=True, null=True)
-    marital_status = models.CharField(max_length=250, blank=True, null=True)
+    marital_status = models.CharField(max_length=50, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
     physical_condition = models.CharField(max_length=250, blank=True, null=True)
     weight = models.CharField(max_length=250, blank=True, null=True)
     complexion = models.CharField(max_length=250, blank=True, null=True)
@@ -155,19 +190,19 @@ class Customer(models.Model):
     pin_code = models.CharField(max_length=250, blank=True, null=True)
     street = models.CharField(max_length=250, blank=True, null=True)
     house_name = models.CharField(max_length=250, blank=True, null=True)
-    status = models.IntegerField(blank=True, null=True)
-    is_active = models.IntegerField(
-        blank=True, null=True, 
-        db_comment="1- approved 2- disapproved 0-pending"
+    STATUS_CHOICES = (
+        (0, "Pending"),   
+        (1, "Approved"),  
     )
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+    is_active= models.BooleanField(default=True)
     created = models.DateTimeField(blank=True, null=True)
     updated = models.DateTimeField(blank=True, null=True)
     dosham = models.CharField(max_length=50, blank=True, null=True)
 
-
-
     def __str__(self):
         return self.user.username if self.user else "No User"
+
 
 # -----------------PAYMENT MODEL---------------
 class Payment(models.Model):
