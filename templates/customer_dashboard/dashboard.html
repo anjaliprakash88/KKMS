@@ -171,8 +171,13 @@
         <div class="container">
             <a class="navbar-brand" href="#"><i class="fas fa-heart"></i> Matrimony Dashboard</a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link btn-profile" href=""><i class="fas fa-user"></i> Matching Profiles</a>
-                <a class="btn-logout" href=""><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a class="nav-link btn-profile" href="{% url 'matching_profiles' %}"><i class="fas fa-user"></i> Matching Profiles</a>
+                <div class="logout-section">
+                <a href="#" class="logout-link" onclick="confirmLogout(event)">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </div>
             </div>
         </div>
     </nav>
@@ -397,6 +402,14 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmLogout(event) {
+                    event.preventDefault(); // prevent default link behavior
+                    if (confirm('Are you sure you want to logout?')) {
+                        window.location.href = "{% url 'customer-login' %}";
+                    }
+                }
+    </script>
 </body>
 
 </html>

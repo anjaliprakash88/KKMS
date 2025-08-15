@@ -16,6 +16,36 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+@login_required
+def matching_profiles(request):
+    logged_in_customer = Customer.objects.get(user=request.user)
+    
+    # Get the caste and gender of the logged-in user
+    user_caste = logged_in_customer.caste
+    user_gender = logged_in_customer.gender
+    
+    # Determine the opposite gender
+    if user_gender == 'Male':
+        opposite_gender = 'Female'
+    elif user_gender == 'Female':
+        opposite_gender = 'Male'
+    else:
+        # Handle other cases if necessary
+        opposite_gender = None
+        
+    matching_profiles = []
+    
+    if opposite_gender:
+        # Filter for profiles with the same caste and opposite gender
+        matching_profiles = Customer.objects.filter(
+            Q(caste=user_caste) & Q(gender=opposite_gender)
+        ).exclude(user=request.user) # Exclude the logged-in user
+        
+    context = {
+        'matching_profiles': matching_profiles,
+        'logged_in_customer': logged_in_customer,
+    }
+    return render(request, 'customer_dashboard/matching_profiles.html', context)
 
 
 def about_us_add(request):
@@ -215,11 +245,13 @@ def register_customer(request):
 
         try:
             last_customer = Customer.objects.latest('id')
-            # The id_proof field is a CharField, so you need to convert to an integer.
-            # You should use a better field type like IntegerField if this is a number.
-            next_id_proof = int(last_customer.id_proof) + 1
+            # Check if id_proof is not None and is a valid number string
+            if last_customer.id_proof and last_customer.id_proof.isdigit():
+                next_id_proof = int(last_customer.id_proof) + 1
+            else:
+                next_id_proof = 1
         except Customer.DoesNotExist:
-            next_id_proof = 1    
+            next_id_proof = 1   
 
         # Create User
         user = User.objects.create_user(
