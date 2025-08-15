@@ -36,7 +36,7 @@ def edit_profile(request):
         
         if 'profile_image' in request.FILES:
             customer_profile.profile_image = request.FILES['profile_image']
-            
+
         # Update Customer model fields from the POST data
         customer_profile.father_name = request.POST.get('father_name', customer_profile.father_name)
         customer_profile.age = request.POST.get('age') or customer_profile.age
@@ -45,11 +45,36 @@ def edit_profile(request):
         customer_profile.star = request.POST.get('star', customer_profile.star)
         customer_profile.marital_status = request.POST.get('marital_status', customer_profile.marital_status)
         customer_profile.education = request.POST.get('education', customer_profile.education)
-        customer_profile.caste = request.POST.get('caste', customer_profile.caste)
         customer_profile.dosham = request.POST.get('dosham', customer_profile.dosham)
 
-        customer_profile.description  = request.POST.get('description ', customer_profile.description )
-        # Add more fields as needed
+        customer_profile.description  = request.POST.get('description', customer_profile.description )
+        customer_profile.address = request.POST.get('address', customer_profile.address)
+        customer_profile.married_sisters = request.POST.get('married_sisters', customer_profile.married_sisters)
+        customer_profile.married_brothers = request.POST.get('married_brothers', customer_profile.married_brothers)
+        
+        customer_profile.mother_job = request.POST.get('mother_job', customer_profile.mother_job)
+        customer_profile.father_job = request.POST.get('father_job', customer_profile.father_job)
+        customer_profile.mother_name = request.POST.get('mother_name', customer_profile.mother_name)
+        customer_profile.income = request.POST.get('income', customer_profile.income)
+        customer_profile.job_city = request.POST.get('job_city', customer_profile.job_city)
+        customer_profile.job_department = request.POST.get('job_department', customer_profile.job_department)
+        customer_profile.company = request.POST.get('company', customer_profile.company)
+        customer_profile.job = request.POST.get('job', customer_profile.job)
+        customer_profile.caste = request.POST.get('caste', customer_profile.caste)
+        customer_profile.marital_status = request.POST.get('marital_status', customer_profile.marital_status)
+        customer_profile.physical_condition = request.POST.get('physical_condition', customer_profile.physical_condition)
+        customer_profile.weight = request.POST.get('weight', customer_profile.weight)
+        customer_profile.complexion = request.POST.get('complexion', customer_profile.complexion)
+        customer_profile.height = request.POST.get('height', customer_profile.height)
+        customer_profile.time_birth = request.POST.get('time_birth', customer_profile.time_birth)
+        customer_profile.place_birth = request.POST.get('place_birth', customer_profile.place_birth)
+        customer_profile.dob = request.POST.get('dob', customer_profile.dob)
+        customer_profile.district = request.POST.get('district', customer_profile.district)
+        customer_profile.city = request.POST.get('city', customer_profile.city)
+        customer_profile.post = request.POST.get('post', customer_profile.post)
+        customer_profile.pin_code = request.POST.get('pin_code', customer_profile.pin_code)
+        customer_profile.street = request.POST.get('street', customer_profile.street)
+        customer_profile.house_name = request.POST.get('house_name', customer_profile.house_name)
 
         customer_profile.save()
         
