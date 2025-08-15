@@ -16,31 +16,29 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+def get_profile_details(request, profile_id):
+    profile = get_object_or_404(Customer, pk=profile_id)
+    return render(request, 'customer_dashboard/matching_profiles.html', {'profile': profile})
+
 @login_required
 def matching_profiles(request):
     logged_in_customer = Customer.objects.get(user=request.user)
-    
-    # Get the caste and gender of the logged-in user
     user_caste = logged_in_customer.caste
     user_gender = logged_in_customer.gender
-    
-    # Determine the opposite gender
+
     if user_gender == 'Male':
         opposite_gender = 'Female'
     elif user_gender == 'Female':
         opposite_gender = 'Male'
     else:
-        # Handle other cases if necessary
         opposite_gender = None
-        
+
     matching_profiles = []
-    
     if opposite_gender:
-        # Filter for profiles with the same caste and opposite gender
         matching_profiles = Customer.objects.filter(
             Q(caste=user_caste) & Q(gender=opposite_gender)
-        ).exclude(user=request.user) # Exclude the logged-in user
-        
+        ).exclude(user=request.user)
+
     context = {
         'matching_profiles': matching_profiles,
         'logged_in_customer': logged_in_customer,
