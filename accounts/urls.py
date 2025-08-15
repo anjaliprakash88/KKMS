@@ -35,6 +35,8 @@ urlpatterns = [
     path('customer-login/', views.customer_login, name='customer-login'),
     path("customer/dashboard/", views.customer_dashboard, name="customer_dashboard"),
     path('matching-profiles/', views.matching_profiles, name='matching_profiles'),
-    path('profile-details/<int:profile_id>/', views.get_profile_details, name='get_profile_details'),
+    path('send-interest/', views.send_interest, name='send_interest'),
+    path('edit-profile/', views.edit_profile, name='edit_profile'),
+   
 ]
 

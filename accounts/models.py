@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
-
+# -----------------CHARITY MODEL---------------
 class CharityManagement(models.Model):
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to="charity/")
@@ -13,6 +13,7 @@ class CharityManagement(models.Model):
     def __str__(self):
         return self.title
 
+# -----------------ABOUT US MODEL---------------
 class AboutUs(models.Model):
     mission = models.TextField()
     affiliation = models.TextField()
@@ -25,6 +26,7 @@ class AboutUs(models.Model):
     def __str__(self):
         return self.main_title
 
+# -----------------ABOUT US IMAGE MODEL---------------
 class AboutUsImage(models.Model):
     about_us = models.ForeignKey(
         AboutUs, on_delete=models.CASCADE, related_name="images"
@@ -40,8 +42,6 @@ class AboutUsImage(models.Model):
 
 
 # ---------------NEWSEVENTS MODEL---------------
-
-
 class NewsEvents(models.Model):
     STATUS_CHOICES = (
         (0, "Inactive"),
@@ -215,3 +215,15 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.customer.user.username} - {self.amount}"
+
+
+class Interest(models.Model):
+    sender = models.ForeignKey(Customer, related_name='sent_interests', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(Customer, related_name='received_interests', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('sender', 'receiver')
+        
+    def __str__(self):
+        return f"{self.sender.user.username} is interested in {self.receiver.user.username}"

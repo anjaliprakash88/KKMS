@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
 from django.http import JsonResponse
-from accounts.models import Customer,NewsEvents,Banners, Payment, AboutUs, CharityManagement, AboutUsImage
+from accounts.models import Customer,NewsEvents,Banners, Payment, AboutUs, CharityManagement, AboutUsImage, Interest
 from django.conf import settings
 from django.db.models import Q
 from django.db.models import Prefetch
@@ -16,36 +16,117 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-def get_profile_details(request, profile_id):
-    profile = get_object_or_404(Customer, pk=profile_id)
-    return render(request, 'customer_dashboard/matching_profiles.html', {'profile': profile})
+@login_required
+def edit_profile(request):
+    try:
+        customer_profile = Customer.objects.get(user=request.user)
+    except Customer.DoesNotExist:
+        messages.error(request, "Profile not found.")
+        return redirect('customer_dashboard')  
 
+    user = request.user
+
+    if request.method == 'POST':
+        # Get data directly from the POST request
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.email = request.POST.get('email', user.email)
+        user.username = request.POST.get('email', user.username) # Update username with email
+        user.save()
+        
+        if 'profile_image' in request.FILES:
+            customer_profile.profile_image = request.FILES['profile_image']
+            
+        # Update Customer model fields from the POST data
+        customer_profile.father_name = request.POST.get('father_name', customer_profile.father_name)
+        customer_profile.age = request.POST.get('age') or customer_profile.age
+        customer_profile.gender = request.POST.get('gender', customer_profile.gender)
+        customer_profile.contact_no = request.POST.get('contact_no', customer_profile.contact_no)
+        customer_profile.star = request.POST.get('star', customer_profile.star)
+        customer_profile.marital_status = request.POST.get('marital_status', customer_profile.marital_status)
+        customer_profile.education = request.POST.get('education', customer_profile.education)
+        customer_profile.caste = request.POST.get('caste', customer_profile.caste)
+        customer_profile.dosham = request.POST.get('dosham', customer_profile.dosham)
+
+        customer_profile.description  = request.POST.get('description ', customer_profile.description )
+        # Add more fields as needed
+
+        customer_profile.save()
+        
+        messages.success(request, "Your profile has been updated successfully!")
+        return redirect('edit_profile')
+
+    context = {
+        'customer_profile': customer_profile,
+        'user': user,
+    }
+    return render(request, 'customer_dashboard/edit_profile.html', context)
+
+@login_required
+def send_interest(request):
+    # This check ensures it's an AJAX POST request, which is a good practice.
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        receiver_id = request.POST.get('receiver_id')
+        
+        if not receiver_id:
+            # Return a JSON error response
+            return JsonResponse({'status': 'error', 'message': 'Invalid request.'}, status=400)
+            
+        try:
+            receiver_profile = get_object_or_404(Customer, id=receiver_id)
+            sender_profile = request.user.customer_profile
+            
+            # Check if interest already exists
+            if Interest.objects.filter(sender=sender_profile, receiver=receiver_profile).exists():
+                return JsonResponse({'status': 'info', 'message': 'Interest already sent.'})
+            
+            # Create the interest record
+            Interest.objects.create(sender=sender_profile, receiver=receiver_profile)
+            
+            # Return a JSON success response
+            return JsonResponse({'status': 'success', 'message': 'Interest sent successfully!'})
+            
+        except Customer.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Profile not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    # If the request is not a POST or not an AJAX request, return a generic error.
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
+# -----------------MATCHING PROFILE VIEW---------------
 @login_required
 def matching_profiles(request):
     logged_in_customer = Customer.objects.get(user=request.user)
     user_caste = logged_in_customer.caste
     user_gender = logged_in_customer.gender
-
+    
     if user_gender == 'Male':
         opposite_gender = 'Female'
     elif user_gender == 'Female':
         opposite_gender = 'Male'
     else:
         opposite_gender = None
-
+        
     matching_profiles = []
+    
     if opposite_gender:
         matching_profiles = Customer.objects.filter(
             Q(caste=user_caste) & Q(gender=opposite_gender)
         ).exclude(user=request.user)
-
+    
+    # Get a list of IDs for all customers the logged-in user has sent interest to
+    sent_interest_ids = Interest.objects.filter(sender=logged_in_customer).values_list('receiver__id', flat=True)
+        
     context = {
         'matching_profiles': matching_profiles,
         'logged_in_customer': logged_in_customer,
+        'sent_interest_ids': sent_interest_ids,  # Pass the list of IDs to the template
     }
     return render(request, 'customer_dashboard/matching_profiles.html', context)
 
-
+# -----------------ABOUT US ADD VIEW---------------
 def about_us_add(request):
     if request.method == "POST":
         main_title = request.POST.get("main_title")
@@ -77,7 +158,7 @@ def about_us_add(request):
 
     return redirect("about-us-list")
 
-    
+# -----------------ABOUT US LIST VIEW---------------   
 def about_us_list(request):
     # Fetch all active AboutUs entries with only active images
     about_entries = AboutUs.objects.filter(is_active=True).prefetch_related(
@@ -94,11 +175,12 @@ def about_us_list(request):
         {"about_entries": about_entries},
     )
 
+# -----------------BANNER LIST VIEW---------------
 def banner_list_view(request):
     banners = Banners.objects.filter(is_active=True).order_by("-id")
     return render(request, "super_admin/banner.html", {"banners": banners})
 
-
+# -----------------BANNER ADD VIEW---------------
 def banner_add_view(request):
     if request.method == "POST":
         banner_image = request.FILES.get("banner_image")
@@ -117,6 +199,7 @@ def banner_add_view(request):
         messages.success(request, "Banner added successfully!")
         return redirect("banner-list")    
 
+# -----------------BANNER EDIT VIEW---------------
 def banner_edit(request, pk):
     banner = get_object_or_404(Banners, pk=pk)
     if request.method == "POST":
@@ -131,22 +214,25 @@ def banner_edit(request, pk):
 
     return redirect("banner-list")
 
+# -----------------BANNER DELETE VIEW---------------
 def banner_delete(request, pk):
     banner = get_object_or_404(Banners, pk=pk)
     banner.is_active = False  # soft delete
     banner.save()
     return redirect('banner-list') 
 
-
+# -----------------CONTACT VIEW---------------
 def contact(request):
     return render(request, "accounts/contact.html")
-    
+
+# -----------------PRIVACY POLICY VIEW---------------    
 def privacy_policy(request):
     return render(request, "accounts/privacy_policy.html")
 
-
+# -----------------TERMS VIEW---------------
 def terms(request):
     return render(request, "accounts/terms.html")
+
 
 def charity_view(request):
     """

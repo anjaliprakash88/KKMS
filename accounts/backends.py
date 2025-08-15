@@ -1,10 +1,8 @@
-# your_app/backends.py
-
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
-# Rename the class to match the name in settings.py
+
 class CustomerEmailOrPhoneBackend(BaseBackend):
     def authenticate(self, request, identifier=None, password=None, **kwargs):
         UserModel = get_user_model()

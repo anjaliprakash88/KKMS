@@ -1,0 +1,58 @@
+<div class="container mt-5">
+    <h2>Edit Profile</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="first_name" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+        </div>
+        <div class="mb-3">
+            <label for="last_name" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="age" class="form-label">Age</label>
+            <input type="number" class="form-control" id="age" name="age" value="{{ customer_profile.age }}">
+        </div>
+        <div class="mb-3">
+            <label for="contact_no" class="form-label">Mobile</label>
+            <input type="text" class="form-control" id="contact_no" name="contact_no" value="{{ customer_profile.contact_no }}">
+        </div>
+        <div class="mb-3">
+            <label for="caste" class="form-label">Caste</label>
+            <select class="form-control" id="caste" name="caste">
+                <option value="">Select Caste</option>
+                {% for key, value in customer_profile.CASTE_CHOICES %}
+                    <option value="{{ key }}" {% if customer_profile.caste == key %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="description " class="form-label">Description</label>
+            <input type="text" class="form-control" id="description " name="description " value="{{ customer_profile.description  }}">
+        </div>
+
+
+        <div class="mb-3">
+            <label class="form-label">Current Profile Image</label>
+            {% if customer_profile.profile_image %}
+                <img src="{{ customer_profile.profile_image.url }}" alt="Current Profile Image" style="max-width: 200px; display: block;">
+            {% else %}
+                <p>No profile image uploaded.</p>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="profile_image" class="form-label">Upload New Image</label>
+            <input type="file" class="form-control" id="profile_image" name="profile_image">
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'customer_dashboard' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
