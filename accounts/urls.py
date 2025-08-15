@@ -28,6 +28,7 @@ urlpatterns = [
     path('customers/', views.customer_list, name='customer-list'),
 
     path("about-us/", views.about_us_list, name="about-us-list"),
+    path('about-us/add/', views.about_us_add, name='about-us-add'),
 
 
     path('register-customer/', views.register_customer, name='register_customer'),

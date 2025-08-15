@@ -17,6 +17,39 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+
+def about_us_add(request):
+    if request.method == "POST":
+        main_title = request.POST.get("main_title")
+        mission = request.POST.get("mission")
+        affiliation = request.POST.get("affiliation")
+        history = request.POST.get("history")
+        is_active = bool(int(request.POST.get("is_active", 1)))
+
+        about = AboutUs.objects.create(
+            main_title=main_title,
+            mission=mission,
+            affiliation=affiliation,
+            history=history,
+            is_active=is_active
+        )
+
+        images = request.FILES.getlist("images[]")
+        designations = request.POST.getlist("designations[]")
+
+        for img_file, desig in zip(images, designations):
+            AboutUsImage.objects.create(
+                about_us=about,
+                image=img_file,
+                designation=desig,
+                is_active=True
+            )
+
+        return redirect("about-us-list")  # replace with your list page name
+
+    return redirect("about-us-list")
+
+    
 def about_us_list(request):
     # Fetch all active AboutUs entries with only active images
     about_entries = AboutUs.objects.filter(is_active=True).prefetch_related(
@@ -106,16 +139,18 @@ def about(request):
     return render(request, "accounts/about.html", context)
 
 def home(request):
-    banners = Banners.objects.filter(status=1).order_by("-id") 
-    news_articles = NewsEvents.objects.filter(status=1).order_by("-id")
+    latest_banner = Banners.objects.filter(status=1).order_by("-id").first()
+    latest_news = NewsEvents.objects.filter(status=1).order_by("-id")[:3]  # latest 3 news
+
     return render(
         request,
         "accounts/index.html",
         {
-            "banners": banners,
-            "news_articles": news_articles,
+            "banner": latest_banner,
+            "news_articles": latest_news,
         },
     )
+
 
 
 @login_required

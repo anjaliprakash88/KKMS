@@ -2,16 +2,16 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-            <div class="header">
-                <div class="header-content">
-                    <h1>About us Management</h1>
-                    <p>Manage and organize your KKMS news articles</p>
-                </div>
-                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addAboutModal">
-                    ➕ Add About Us 
-                </button>
+<div class="header">
+    <div class="header-content">
+        <h1>About us Management</h1>
+        <p>Manage and organize your KKMS news articles</p>
+    </div>
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addAboutModal">
+        ➕ Add About Us
+    </button>
 
-            </div>
+</div>
 <div class="container mt-5">
     <h2>About Us Entries</h2>
     <table id="aboutUsTable" class="display table table-bordered">
@@ -37,9 +37,9 @@
                 <td>{{ about.history }}</td>
                 <td>
                     {% for img in about.active_images %}
-                        <img src="{{ img.image.url }}" alt="{{ img.designation }}" width="50" style="margin:2px;">
+                    <img src="{{ img.image.url }}" alt="{{ img.designation }}" width="50" style="margin:2px;">
                     {% empty %}
-                        No images
+                    No images
                     {% endfor %}
                 </td>
                 <td>{{ about.created_at|date:"Y-m-d H:i" }}</td>
@@ -50,8 +50,111 @@
     </table>
 </div>
 
+
+<!-- Add About Us Modal -->
+<div class="modal fade" id="addAboutModal" tabindex="-1" aria-labelledby="addAboutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{% url 'about-us-add' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="addAboutModalLabel">Add About Us Entry</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>Main Title</label>
+            <input type="text" name="main_title" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label>Mission</label>
+            <textarea name="mission" class="form-control" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label>Affiliation</label>
+            <textarea name="affiliation" class="form-control" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label>History</label>
+            <textarea name="history" class="form-control" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label>Images</label>
+            <div id="aboutImagesContainer">
+              <div class="row mb-2 about-image-row">
+                <div class="col-md-6">
+                  <input type="file" name="images[]" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <input type="text" name="designations[]" class="form-control" placeholder="Designation (optional)">
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-secondary" id="addMoreImages">➕ Add More Images</button>
+          </div>
+
+          <div class="mb-3">
+            <label>Status</label>
+            <select name="is_active" class="form-control">
+              <option value="1">Active</option>
+              <option value="0">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Add About Us</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- JS to add more image fields -->
 <script>
-    $(document).ready(function() {
+document.getElementById('addMoreImages').addEventListener('click', function() {
+  const container = document.getElementById('aboutImagesContainer');
+  const row = document.createElement('div');
+  row.classList.add('row', 'mb-2', 'about-image-row');
+  row.innerHTML = `
+    <div class="col-md-6">
+      <input type="file" name="images[]" class="form-control" required>
+    </div>
+    <div class="col-md-6">
+      <input type="text" name="designations[]" class="form-control" placeholder="Designation (optional)">
+    </div>
+  `;
+  container.appendChild(row);
+});
+</script>
+
+
+
+<script>
+    document.getElementById('addMoreImages').addEventListener('click', function () {
+        const container = document.getElementById('aboutImagesContainer');
+        const row = document.createElement('div');
+        row.classList.add('row', 'mb-2', 'about-image-row');
+        row.innerHTML = `
+    <div class="col-md-6">
+      <input type="file" name="images[]" class="form-control" required>
+    </div>
+    <div class="col-md-6">
+      <input type="text" name="designations[]" class="form-control" placeholder="Designation (optional)">
+    </div>
+  `;
+        container.appendChild(row);
+    });
+
+
+
+    $(document).ready(function () {
         $('#aboutUsTable').DataTable({
             "pageLength": 10,
             "lengthChange": true,
