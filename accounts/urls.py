@@ -26,6 +26,7 @@ urlpatterns = [
     path("banners/<int:pk>/delete/", views.banner_delete, name="banner-delete"),
 
     path('customers/', views.customer_list, name='customer-list'),
+    path('customers/<int:pk>/', views.CustomerDetailView.as_view(), name='customer_detail'),
 
     path("about-us/", views.about_us_list, name="about-us-list"),
     path('about-us/add/', views.about_us_add, name='about-us-add'),

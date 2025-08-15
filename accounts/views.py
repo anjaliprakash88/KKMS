@@ -15,6 +15,12 @@ from django.db.models import Prefetch
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 User = get_user_model()
+from django.views.generic.detail import DetailView
+
+class CustomerDetailView(DetailView):
+    model = Customer
+    template_name = 'super_admin/customer_detail.html'
+    context_object_name = 'customer'
 
 @login_required
 def edit_profile(request):
