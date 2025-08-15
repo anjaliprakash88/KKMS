@@ -175,13 +175,13 @@ def customer_login(request):
         identifier = request.POST.get("email_or_mobile")
         password = request.POST.get("password")
 
-        # Try to authenticate using email first, then phone
-        user = authenticate(request, email=identifier, phone=identifier, password=password)
+        # The authenticate function will now check all configured backends
+        user = authenticate(request, identifier=identifier, password=password)
 
         if user is not None:
             login(request, user)
             messages.success(request, f"Welcome {user.email}!")
-            return redirect("customer_dashboard")  # replace with your dashboard URL
+            return redirect("customer_dashboard")
         else:
             messages.error(request, "Invalid email/phone or password.")
 
@@ -213,6 +213,14 @@ def register_customer(request):
             messages.error(request, "A user with this email already exists.")
             return redirect("register_customer")
 
+        try:
+            last_customer = Customer.objects.latest('id')
+            # The id_proof field is a CharField, so you need to convert to an integer.
+            # You should use a better field type like IntegerField if this is a number.
+            next_id_proof = int(last_customer.id_proof) + 1
+        except Customer.DoesNotExist:
+            next_id_proof = 1    
+
         # Create User
         user = User.objects.create_user(
             username=email,
@@ -233,7 +241,7 @@ def register_customer(request):
             contact_no=mobile,
             description=request.POST.get("expectation"),
             profile_image=request.FILES.get("profile_image"),
-            id_proof=request.POST.get("id_proof"),
+            id_proof=str(next_id_proof),
             address=request.POST.get("current_address"),
             star=request.POST.get("customer_star") or None,
             married_sisters=request.POST.get("married_sisters"),

@@ -215,9 +215,9 @@
                     <p>Your account registration status and basic information</p>
                     <div class="d-flex align-items-center">
                         <span class="me-3"><strong>Status:</strong></span>
-                        {% if customer.is_active == 1 %}
+                        {% if customer.status == 1 %}
                         <span class="status-badge status-approved">Approved</span>
-                        {% elif customer.is_active == 0 %}
+                        {% elif customer.status == 0 %}
                         <span class="status-badge status-pending">Pending Approval</span>
                         {% else %}
                         <span class="status-badge status-disapproved">Disapproved</span>
@@ -229,7 +229,7 @@
                 </div>
                 <div class="col-md-4 text-end">
                     <div class="text-muted">
-                        <small>Member since: {{ customer.created_at|date:"M d, Y" }}</small>
+                        <small>Member since: {{ customer.created|date:"M d, Y" }}</small>
                     </div>
                 </div>
             </div>
@@ -331,13 +331,11 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Brothers:</span>
-                        <span class="info-value">{{ customer.no_brothers }} ({{
-                            customer.married_brothers }} married)</span>
+                        <span class="info-value">{{ customer.no_brothers }} married</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Sisters:</span>
-                        <span class="info-value">{{ customer.no_sisters }} ({{
-                            customer.married_sisters }} married)</span>
+                        <span class="info-value">{{ customer.no_sisters }} married</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Caste:</span>

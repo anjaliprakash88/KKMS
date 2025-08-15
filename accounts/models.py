@@ -196,8 +196,8 @@ class Customer(models.Model):
     )
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     is_active= models.BooleanField(default=True)
-    created = models.DateTimeField(blank=True, null=True)
-    updated = models.DateTimeField(blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     dosham = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
