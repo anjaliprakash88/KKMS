@@ -189,25 +189,48 @@ def customer_login(request):
 
 def register_customer(request):
     if request.method == "POST":
-        # Get basic user info
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+        # Get form values
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password", "")
+        confirm_password = request.POST.get("confirm_password", "")
+        mobile = request.POST.get("mobile", "").strip()
+        
+        # Get first_name and last_name from the form
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
 
-        # Set username to email
+        # Required field validation
+        if not email or not password or not mobile or not first_name:
+            messages.error(request, "Email, password, first name, and mobile are required.")
+            return redirect("register_customer")
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect("register_customer")
+
+        # Check if user already exists
+        if User.objects.filter(username=email).exists():
+            messages.error(request, "A user with this email already exists.")
+            return redirect("register_customer")
+
+        # Create User
         user = User.objects.create_user(
             username=email,
             email=email,
             password=password,
-            is_customer=True
+            is_active=True,
+            # Pass the first and last name here
+            first_name=first_name,
+            last_name=last_name
         )
 
-        # Create Customer record
-        customer = Customer.objects.create(
+        # Create Customer profile
+        Customer.objects.create(
             user=user,
             father_name=request.POST.get("father_name"),
             age=request.POST.get("age") or None,
             gender=request.POST.get("gender"),
-            contact_no=request.POST.get("mobile"),
+            contact_no=mobile,
             description=request.POST.get("expectation"),
             profile_image=request.FILES.get("profile_image"),
             id_proof=request.POST.get("id_proof"),
@@ -215,8 +238,8 @@ def register_customer(request):
             star=request.POST.get("customer_star") or None,
             married_sisters=request.POST.get("married_sisters"),
             married_brothers=request.POST.get("married_brothers"),
-            no_sisters=request.POST.get("no_sisters"),
-            no_brothers=request.POST.get("no_brothers"),
+            no_sisters=request.POST.get("num_sisters"),
+            no_brothers=request.POST.get("num_brothers"),
             mother_job=request.POST.get("mother_job"),
             father_job=request.POST.get("father_job"),
             mother_name=request.POST.get("mother_name"),
@@ -226,7 +249,7 @@ def register_customer(request):
             education=request.POST.get("education"),
             income=request.POST.get("monthly_income"),
             job_city=request.POST.get("job_city"),
-            job_department=request.POST.get("job_department"),
+            job_department=request.POST.get("job_sector"),
             company=request.POST.get("company"),
             job=request.POST.get("job"),
             caste=request.POST.get("caste"),
@@ -244,17 +267,23 @@ def register_customer(request):
             pin_code=request.POST.get("pincode"),
             street=request.POST.get("street"),
             house_name=request.POST.get("house_name"),
-            status=request.POST.get("status") or None,
-            is_active=request.POST.get("is_active") or 0,
             dosham=request.POST.get("dosham"),
+            status=0,  # default pending
+            is_active=True,
+            created=None,
+            updated=None
         )
 
         messages.success(request, "Customer registered successfully!")
-        return redirect("register_customer")  # redirect back to form
+        return redirect("register_customer")
 
-    return render(request, "customer/register.html")
-
-
+    
+    context = {
+        "CASTE_CHOICES": Customer.CASTE_CHOICES,
+        "MARITAL_STATUS_CHOICES": Customer.MARITAL_STATUS_CHOICES,
+        "STAR_CHOICES": Customer.STAR_CHOICES,
+    }
+    return render(request, "customer/register.html", context) 
 
 
 def news_delete(request, pk):
