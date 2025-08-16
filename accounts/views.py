@@ -83,7 +83,15 @@ def payment_modal(request, pk):
     if request.method == "POST":
         amount = request.POST.get("amount")
         if amount:
-            Payment.objects.create(customer=customer, amount=amount, payment_date=now())
+            Payment.objects.create(
+                customer=customer,
+                amount=amount,
+                payment_date=now()
+            )
+            # ✅ Mark customer as Approved
+            customer.status = 1
+            customer.save(update_fields=["status"])
+
             payments = customer.payments.filter(is_active=True).order_by("-payment_date")
 
     return render(request, "super_admin/payment_modal.html", {
@@ -92,16 +100,25 @@ def payment_modal(request, pk):
     })
 
 # Handle new payment submission
+
 def add_payment(request, pk):
     if request.method == "POST":
         customer = get_object_or_404(Customer, pk=pk)
         amount = request.POST.get("amount")
+
+        # Create payment
         Payment.objects.create(
             customer=customer,
             payment_date=timezone.now(),
             amount=amount,
         )
+
+        # ✅ Update customer status to Approved
+        customer.status = 1  # 1 = Approved
+        customer.save(update_fields=["status"])
+
         return JsonResponse({"success": True})
+
     return JsonResponse({"success": False}, status=400)
 
 class CustomerDetailView(DetailView):
