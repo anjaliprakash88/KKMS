@@ -25,7 +25,7 @@ from django.utils.timezone import make_aware
 from datetime import datetime
 
 
-
+@login_required
 def edit_payment(request):
     if request.method == "POST":
         payment_id = request.POST.get("payment_id")
@@ -41,7 +41,7 @@ def edit_payment(request):
 
         return redirect("payments_list") 
 
-
+@login_required
 def payments_list(request):
     # Step 1: Get the latest payment_date for each customer
     latest_dates = Payment.objects.filter(is_active=True).values("customer").annotate(
@@ -58,6 +58,7 @@ def payments_list(request):
         "payments": latest_payments
     })
 
+@login_required
 def change_password_modal(request, pk):
     customer = get_object_or_404(Customer, id=pk)
     user = customer.user   # assuming Customer has OneToOne/ForeignKey to User
@@ -76,6 +77,7 @@ def change_password_modal(request, pk):
 
     return render(request, "super_admin/change_password_modal.html", {"customer": customer})
 
+@login_required
 def payment_modal(request, pk):
     customer = get_object_or_404(Customer, id=pk)
     payments = customer.payments.filter(is_active=True).order_by("-payment_date")
@@ -100,7 +102,7 @@ def payment_modal(request, pk):
     })
 
 # Handle new payment submission
-
+@login_required
 def add_payment(request, pk):
     if request.method == "POST":
         customer = get_object_or_404(Customer, pk=pk)
@@ -252,7 +254,7 @@ def edit_profile(request):
     }
     return render(request, 'customer_dashboard/edit_profile.html', context)
 
-@login_required
+
 def send_interest(request):
     # This check ensures it's an AJAX POST request, which is a good practice.
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -349,6 +351,7 @@ def about_us_add(request):
     return redirect("about-us-list")
 
 # -----------------ABOUT US LIST VIEW---------------   
+@login_required
 def about_us_list(request):
     # Fetch all active AboutUs entries with only active images
     about_entries = AboutUs.objects.filter(is_active=True).prefetch_related(
@@ -366,6 +369,7 @@ def about_us_list(request):
     )
 
 # -----------------BANNER LIST VIEW---------------
+@login_required
 def banner_list_view(request):
     banners = Banners.objects.filter(is_active=True).order_by("-id")
     return render(request, "super_admin/banner.html", {"banners": banners})
@@ -644,6 +648,7 @@ def news_create(request):
         return redirect('news_list')  # reload page after adding
     return redirect('news_list')
 
+@login_required
 def news_list(request):
     news_list = NewsEvents.objects.all().order_by('-id')  # latest first
     return render(request, 'super_admin/news.html', {'news_list': news_list})
