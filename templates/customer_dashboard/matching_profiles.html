@@ -188,15 +188,23 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1><i class="fas fa-tachometer-alt"></i> Welcome, {{ customer.user.get_full_name }}!</h1>
+                    <h1><i class="fas fa-tachometer-alt"></i>
+                        Welcome, {{ logged_in_customer.user.get_full_name }}!
+                    </h1>
+
                     <p class="mb-0">Manage your matrimony profile and find your perfect match</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    {% if customer.profile_image %}
-                    <img src="{{ customer.profile_image.url }}" alt="Profile Image" class="profile-image">
-                    {% else %}
-                    <img src="https://via.placeholder.com/200" alt="No Image" class="img-fluid rounded">
-                    {% endif %}
+                    {% if logged_in_customer.profile_image %}
+    <img src="{{ logged_in_customer.profile_image.url }}" 
+         alt="Profile Image" 
+         class="profile-image">
+{% else %}
+    <img src="https://via.placeholder.com/200" 
+         alt="No Image" 
+         class="img-fluid rounded">
+{% endif %}
+
                 </div>
             </div>
         </div>
