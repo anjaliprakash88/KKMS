@@ -29,6 +29,15 @@ urlpatterns = [
     path('customers/<int:pk>/', views.CustomerDetailView.as_view(), name='customer_detail'),
     path('customers/<int:pk>/edit/', views.CustomerUpdateView.as_view(), name='customer_edit'),
 
+
+    path("customers/<int:pk>/payments/modal/", views.payment_modal, name="payment_modal"),
+    path("customers/<int:pk>/payments/add/", views.add_payment, name="add_payment"),
+    path("customers/<int:pk>/change-password/modal/", views.change_password_modal, name="change_password_modal"),
+
+    path("payments/", views.payments_list, name="payments_list"),
+    path("payments/edit/", views.edit_payment, name="edit_payment"),
+
+
     path("about-us/", views.about_us_list, name="about-us-list"),
     path('about-us/add/', views.about_us_add, name='about-us-add'),
 

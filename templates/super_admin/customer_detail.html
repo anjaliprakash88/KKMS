@@ -118,6 +118,46 @@
     <p><strong>Address:</strong> {{ customer.address }}</p>
 
     <button id="editBtn" class="btn btn-primary mt-3">Edit Profile</button>
+   <button id="changePasswordBtn" class="btn btn-warning mt-3" data-customer="{{ customer.id }}">
+    Change Password
+</button>
+    <button id="paymentBtn" class="btn btn-primary mt-3" data-customer="{{ customer.id }}">
+    Payment
+</button>
+
+
+
+
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" id="changePasswordModalContent">
+      <!-- Content loaded by AJAX -->
+    </div>
+  </div>
+</div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Payments</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal">X</button>
+      </div>
+      <div class="modal-body" id="paymentModalBody">
+        <!-- AJAX loads payment_modal.html here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    
+
+
 
     <div id="editModal" class="modal">
         <div class="modal-content">
@@ -125,8 +165,8 @@
             <h2>Edit Profile</h2>
 
 
-           <form method="post" id="editProfileForm" enctype="multipart/form-data"
-      action="{% url 'customer_edit' customer.id %}">
+            <form method="post" id="editProfileForm" enctype="multipart/form-data"
+                action="{% url 'customer_edit' customer.id %}">
                 {% csrf_token %}
 
                 <div class="row">
@@ -154,13 +194,13 @@
                         <label for="age" class="form-label">Age</label>
                         <input type="number" class="form-control" id="age" name="age" value="{{ customer.age }}">
                     </div>
-                   <div class="col-md-6 mb-3">
-    <label for="gender" class="form-label">Gender</label>
-    <select class="form-control" id="gender" name="gender">
-        <option value="Male" {% if customer.gender == 'Male' %}selected{% endif %}>Male</option>
-        <option value="Female" {% if customer.gender == 'Female' %}selected{% endif %}>Female</option>
-    </select>
-</div>
+                    <div class="col-md-6 mb-3">
+                        <label for="gender" class="form-label">Gender</label>
+                        <select class="form-control" id="gender" name="gender">
+                            <option value="Male" {% if customer.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if customer.gender == 'Female' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
 
                     <div class="col-md-12 mb-3">
                         <label class="form-label">Current Profile Image</label>
@@ -378,10 +418,45 @@
 
 
 
+            <!-- Bootstrap Bundle with Popper -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+                crossorigin="anonymous"></script>
 
 
 
             <script>
+
+
+
+
+
+document.getElementById("changePasswordBtn").addEventListener("click", function() {
+    let customerId = this.getAttribute("data-customer");
+    fetch(`/customers/${customerId}/change-password/modal/`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById("changePasswordModalContent").innerHTML = html;
+            let modal = new bootstrap.Modal(document.getElementById("changePasswordModal"));
+            modal.show();
+        });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const paymentBtn = document.getElementById("paymentBtn");
+
+    paymentBtn.addEventListener("click", function () {
+        const customerId = this.getAttribute("data-customer");
+
+        fetch(`/customers/${customerId}/payments/modal/`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById("paymentModalBody").innerHTML = html;
+                let modal = new bootstrap.Modal(document.getElementById("paymentModal"));
+                modal.show();
+            });
+    });
+});
                 // Get the modal
                 var modal = document.getElementById("editModal");
 

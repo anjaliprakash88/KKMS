@@ -18,6 +18,91 @@ User = get_user_model()
 from django.views.generic import DetailView,UpdateView
 from django.urls import reverse_lazy
 from django.views import View
+from django.utils.timezone import now
+from django.contrib.auth.hashers import make_password
+from django.db.models import Max
+from django.utils.timezone import make_aware
+from datetime import datetime
+
+
+
+def edit_payment(request):
+    if request.method == "POST":
+        payment_id = request.POST.get("payment_id")
+        amount = request.POST.get("amount")
+        payment_date = request.POST.get("payment_date")
+
+        payment = get_object_or_404(Payment, id=payment_id)
+
+        if payment_date:
+            payment.payment_date = make_aware(datetime.fromisoformat(payment_date))
+        payment.amount = amount
+        payment.save()
+
+        return redirect("payments_list") 
+
+
+def payments_list(request):
+    # Step 1: Get the latest payment_date for each customer
+    latest_dates = Payment.objects.filter(is_active=True).values("customer").annotate(
+        latest_date=Max("payment_date")
+    )
+
+    # Step 2: Get the actual Payment records matching those dates
+    latest_payments = Payment.objects.filter(
+        is_active=True,
+        payment_date__in=[item["latest_date"] for item in latest_dates]
+    ).select_related("customer", "customer__user")
+
+    return render(request, "super_admin/payments_list.html", {
+        "payments": latest_payments
+    })
+
+def change_password_modal(request, pk):
+    customer = get_object_or_404(Customer, id=pk)
+    user = customer.user   # assuming Customer has OneToOne/ForeignKey to User
+
+    if request.method == "POST":
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if new_password and new_password == confirm_password:
+            user.password = make_password(new_password)
+            user.save()
+            messages.success(request, "Password changed successfully!")
+            return redirect(request.META.get("HTTP_REFERER", "/"))
+        else:
+            messages.error(request, "Passwords do not match!")
+
+    return render(request, "super_admin/change_password_modal.html", {"customer": customer})
+
+def payment_modal(request, pk):
+    customer = get_object_or_404(Customer, id=pk)
+    payments = customer.payments.filter(is_active=True).order_by("-payment_date")
+
+    if request.method == "POST":
+        amount = request.POST.get("amount")
+        if amount:
+            Payment.objects.create(customer=customer, amount=amount, payment_date=now())
+            payments = customer.payments.filter(is_active=True).order_by("-payment_date")
+
+    return render(request, "super_admin/payment_modal.html", {
+        "customer": customer,
+        "payments": payments,
+    })
+
+# Handle new payment submission
+def add_payment(request, pk):
+    if request.method == "POST":
+        customer = get_object_or_404(Customer, pk=pk)
+        amount = request.POST.get("amount")
+        Payment.objects.create(
+            customer=customer,
+            payment_date=timezone.now(),
+            amount=amount,
+        )
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False}, status=400)
 
 class CustomerDetailView(DetailView):
     model = Customer
