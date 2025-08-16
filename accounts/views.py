@@ -15,12 +15,69 @@ from django.db.models import Prefetch
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from django.views.generic.detail import DetailView
+from django.views.generic import DetailView,UpdateView
+from django.urls import reverse_lazy
+from django.views import View
 
 class CustomerDetailView(DetailView):
     model = Customer
     template_name = 'super_admin/customer_detail.html'
     context_object_name = 'customer'
+
+class CustomerUpdateView(View):
+    def post(self, request, pk):
+        customer = get_object_or_404(Customer, pk=pk)
+
+        # Update related User fields
+        customer.user.first_name = request.POST.get("first_name")
+        customer.user.last_name = request.POST.get("last_name")
+        customer.user.email = request.POST.get("email")
+        customer.user.save()
+
+        # Update Customer fields
+        customer.contact_no = request.POST.get("contact_no")
+        customer.age = request.POST.get("age")
+        customer.gender = request.POST.get("gender")
+        customer.father_name = request.POST.get("father_name")
+        customer.mother_name = request.POST.get("mother_name")
+        customer.father_job = request.POST.get("father_job")
+        customer.mother_job = request.POST.get("mother_job")
+        customer.married_sisters = request.POST.get("married_sisters")
+        customer.married_brothers = request.POST.get("married_brothers")
+        customer.caste = request.POST.get("caste")
+        customer.marital_status = request.POST.get("marital_status")
+        customer.star = request.POST.get("star")
+        customer.dosham = request.POST.get("dosham")
+        customer.dob = request.POST.get("dob")
+        customer.time_birth = request.POST.get("time_birth")
+        customer.place_birth = request.POST.get("place_birth")
+        customer.height = request.POST.get("height")
+        customer.weight = request.POST.get("weight")
+        customer.complexion = request.POST.get("complexion")
+        customer.physical_condition = request.POST.get("physical_condition")
+        customer.education = request.POST.get("education")
+        customer.job = request.POST.get("job")
+        customer.company = request.POST.get("company")
+        customer.job_department = request.POST.get("job_department")
+        customer.job_city = request.POST.get("job_city")
+        customer.income = request.POST.get("income")
+        customer.address = request.POST.get("address")
+        customer.house_name = request.POST.get("house_name")
+        customer.street = request.POST.get("street")
+        customer.city = request.POST.get("city")
+        customer.district = request.POST.get("district")
+        customer.post = request.POST.get("post")
+        customer.pin_code = request.POST.get("pin_code")
+        customer.description = request.POST.get("description")
+
+        # Handle profile image if uploaded
+        if "profile_image" in request.FILES:
+            customer.profile_image = request.FILES["profile_image"]
+
+        customer.save()
+
+        return redirect("customer_detail", pk=customer.pk)
+
 
 @login_required
 def edit_profile(request):
